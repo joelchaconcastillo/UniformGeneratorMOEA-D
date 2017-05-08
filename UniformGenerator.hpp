@@ -37,9 +37,9 @@ vector <int> UniformGenerator::generateFirstPrimes(int k)
 	{
 	   for(long long j = i*i; j <= _sieve_size; j +=i)bs[j]=0;
 	   primes.push_back((int) i);
+	   count++;
 	}
-	if(count <= k)break;
-	count++;
+	if(count > k)break;
    }
    return primes;
 }

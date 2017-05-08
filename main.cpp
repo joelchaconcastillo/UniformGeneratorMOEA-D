@@ -17,7 +17,7 @@ using namespace std;
    message += "--h --help print this summary and exit\n";
    message += "--n Number of vector to generate\n";
    message += "--o Number of objectives\n";
-   message += "Example:\n  ";
+   message += "Example:\n  ./GenratorU --n 100 --o 3 > 100.dat";
    return message;
 }
 int main(int argc, char * argv[])
