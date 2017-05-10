@@ -1,3 +1,18 @@
+/*
+   Autor: Joel Chacón Castillo
+   Date: 10-may-17
+
+  Generates weights according to a uniform design of mixtures using the Hammersley lo-discrepancy sequence generator. 
+This method were proposed by Berenguer and Coello Coello (2015).
+References:
+    Tan Y., Y. Jiao, H. Li, and X. Wang (2013).  "MOEA/D + uniform design:
+        A new version of MOEA/D for optimization problems with many
+        objectives."  Computers & Operations Research, 40, 1648-1660.
+    Berenguer, J.A.M. and C.A. Coello Coello (2015).  "Evolutionary Many-
+        Objective Optimization Based on Kuhn-Munkres' Algorithm."  Evolutionary
+        Multi-Criterion Optimization: 8th International Conference, pp. 3-17.
+ 
+*/
 #ifndef UNIFORMGENERATOR_HPP
 #define UNIFORMGENERATOR_HPP
 #include <iostream>
