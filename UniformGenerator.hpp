@@ -75,7 +75,7 @@ vector<vector<double> > UniformGenerator::GenerateWeightVectors(int Objectives, 
   	vector<double> Weight(Objectives); 
 	for(int j = 1; j <= Objectives; j++)
 	{
-	   if(i == Objectives)
+	   if(j == Objectives)
 	 	Weight[j-1] = 1.0;
 	   else
 		Weight[j-1] = 1.0 - pow(designs[i][j-1], 1.0/(Objectives-j));

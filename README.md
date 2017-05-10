@@ -7,3 +7,6 @@
    by
    Yan-yan Tan, Yong-chang jiao, Hong Li, Xin-kuan Wang.
 
+   Note:
+   The generator instead of good lattice point is the hemmersley method
+
