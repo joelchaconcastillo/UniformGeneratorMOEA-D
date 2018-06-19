@@ -19,17 +19,16 @@ References:
 #include <bitset>
 #include <vector>
 #include <cmath>
-#include <cfloat>
 using namespace std;
 class UniformGenerator
 {
    public:
       UniformGenerator();
-   vector< vector< double > > UDM(int Objectives, int N);
-   vector< vector< double > > HeuristicUDM(int Objectives, int N);
+      vector<vector<double> > GenerateWeightVectors(int Objectives, int N);
       
    private:
       vector <int> generateFirstPrimes(int k);
+      vector<vector<double >> Transformation(vector< vector<double > > & designs, int dim);
 //      vector<int> primeFactors(int N);
 //      int EulerPhi(int N);
       inline int gcd(int a, int b) { return (b == 0 ? a : gcd(b, a % b)); }
@@ -37,6 +36,7 @@ class UniformGenerator
         double dist(vector<double> &a, vector<double> &b);
 
     double RadicalInverse(int index, int base);
+   vector< vector< double > > UDM(int Objectives, int N);
 void Hammersley( vector< vector< double> > &set, int n, int k);
 };
 #endif
@@ -93,11 +93,151 @@ double UniformGenerator::Discrepance(vector< vector< double> > & d)
    }
    return Average/d.size();
 }
+vector<vector<double> > UniformGenerator::GenerateWeightVectors(int Objectives, int N)
+{
+
+   vector<vector<double > > designs;
+ //  designs =  UDM(Objectives, N);
+ //  return designs;
+  vector<int> primes = generateFirstPrimes(Objectives-1);
+ int n = N-Objectives;
+ //     vector<double> design(Objectives, 0.0);
+ //     designs.push_back(design);
+   for(int i = 0 ; i < n; i++)
+   {
+      vector<double> design(Objectives, 0.0);
+      design[0] = (2.0*(i+1.0) - 1.0) / (2.0*n);
+//      design[0] = (double)( (i) % (N+1)) / (double) N;
+      for(int j = 1; j < Objectives-1; j++)
+      {
+	   double f = 1.0/primes[j-1];
+	   int d = i+1;
+	   design[j] = 0.0;
+	   while(d > 0)
+	   {
+		design[j] += f*(d % primes[j-1]);
+		d =   (int)((double)d / primes[j-1]); // Here the floor is considered as part of the C++ language.....
+		f = f / primes[j-1];
+	   }
+      }
+	designs.push_back(design);
+   }
+
+//
+//   for(int i = 0; i < N; i++)
+//	{
+//	for(int j = 0; j < Objectives; j++)
+//	cout << designs[i][j] << " ";
+//	cout << endl;
+//	}
+//cout << endl;
+ // The designs are transformed to weight vectors....
+   return Transformation(designs, Objectives); 
+}
+/**
+  Here the hammersley method is implemented....
+**/
+///vector<vector<double> > UniformGenerator::GenerateWeightVectors(int Objectives, int N)
+///{
+///   vector<vector<double > > designs;
+///   vector<int> primes = generateFirstPrimes(Objectives);
+///    
+///  //primes.push_back(1);
+///   for(int i = 2; i < N; i++)
+///     if(gcd(i,N)==1)
+///	primes.push_back(i);
+///  //primes.push_back(13);
+///
+/// //     vector<double> design(Objectives, 0.0);
+/// //     designs.push_back(design);
+/// 
+///
+///double discrepancy = -10000;
+///int z = 1;
+/////for(int i = 0; i < primes.size(); i++)
+///int i=3;
+///{
+///   designs.clear();
+///   for(int k = 0 ; k < N; k++)
+///   {
+///      vector<double> design(Objectives, 0.0);
+///	    design[0] = ( (2.0 * (k+1)) - 1.0) / (2.0*N);
+///	    //for(int i = 1; i < Objectives; i++)
+///	    {
+///	        double q_ki = (  ((k+1)*primes[i]) % N);
+///		if(q_ki == 0) q_ki = N;
+///	 	double x_ki = ( (2.0 * q_ki) - 1.0) / (2.0*N);
+/////		cout << x_ki ; getchar();
+///		design[1] =x_ki ;
+///
+///	    }
+///	    designs.push_back(design);
+///   }
+/// double tmp = Discrepance(designs);
+///  if(discrepancy < tmp)
+///   {
+///	discrepancy = tmp;
+///	z = i;
+///   } 
+///}
+///
+/////cout << z << endl;
+/////getchar();
+/////
+/////   for(int i = 0; i < N; i++)
+/////	{
+/////	for(int j = 0; j < Objectives; j++)
+/////	cout << designs[i][j] << " ";
+/////	cout << endl;
+/////	}
+/////cout << endl;
+/// // The designs are transformed to weight vectors....
+///   return Transformation(designs, Objectives); 
+///}
+/**
+   Transformation Fang and Wang 1994
+**/
+ vector<vector<double> > UniformGenerator::Transformation(vector< vector<double > > & designs, int dim)
+{
+   vector<vector< double > > U;
+
+for(int i = 0; i<dim; i++)
+   {
+  	vector<double> Row(dim); 
+	for(int j = 0; j < dim; j++)
+	{
+	  Row[j] = (i==j)?1.0:0.0;
+	}
+	U.push_back(Row);
+   }
+
+  for(int d = 0; d < designs.size(); d++)
+   {
+  	vector<double> Row(dim); 
+	for(int i = 0; i < dim; i++)
+	{
+	   if(i == dim-1)
+	 	Row[i] = 1.0;
+	   else
+		Row[i] = 1.0 - pow(designs[d][i], 1.0/(dim-i-1));
+	for(int j = 0; j < i; j++)
+	        Row[i] *=  pow( designs[d][j], 1.0/(dim-j-1) );
+	}
+	U.push_back(Row);
+   }
+//   for(int i = design.size()-1; i>=0 ;i--) U[i]=U[i];
+
+   
+
+	return U;
+}
 
 ////////////////////////////////////////////////////////////////////77
 /***************************************************
  * Uniform Design of Mixture with Hammersley Method 
  ***************************************************/
+
+
 /* Radical inverse of a number (index) in a prime base */
 double UniformGenerator::RadicalInverse(int index, int base)
 {
@@ -148,6 +288,12 @@ vector< vector< double > > UniformGenerator::UDM(int Objectives, int N)
             weights[j][i] = w[j-Objectives][i];
 	}
     }
+//for(int i = 0 ; i < weights.size(); i++)
+//	{
+//	   for(int j = 0 ; j < weights[i].size(); j++)
+//	cout << weights[i][j]<<" ";
+//	   cout << endl;
+//	}
 
  return  weights; 
 }
@@ -156,9 +302,7 @@ vector< vector< double > > UniformGenerator::UDM(int Objectives, int N)
 void UniformGenerator::Hammersley( vector< vector< double> > &set, int n, int k)
 {
 
-//      int primes[] = {2,3,5,7,11,13,17,19,23,29}; /*first 10 prime*/
-	vector<int> primes = generateFirstPrimes(k-1);
-
+      int primes[] = {2,3,5,7,11,13,17,19,23,29}; /*first 10 prime*/
     int i,j;
     for (i = 0; i < n; i++)
     {
@@ -166,38 +310,4 @@ void UniformGenerator::Hammersley( vector< vector< double> > &set, int n, int k)
         for (j = 1; j < k; j++)
             set[i][j] = RadicalInverse(i+1, primes[j-1]);            
     }                   
-}
-
-vector< vector< double > > UniformGenerator::HeuristicUDM(int Objectives, int N)
-{
-
-  vector< vector<double> > Lambda = UDM(Objectives, N*100);
-  vector< vector<double> > selected(Objectives);
-  for(int i=Objectives-1; i>=0;i--)
-    {
-      selected[i]=Lambda[i];
-      iter_swap(Lambda.begin()+i, Lambda.end()-1);
-      Lambda.pop_back();
-    }
-
-   while(selected.size()<N)
-   {
-	double maxd=DBL_MIN;
-	int index=-1;
-	for(int j = 0; j < Lambda.size(); j++)
-	{
-	   double mind=DBL_MAX;	
-	   for(int i = 0; i < selected.size(); i++)
-		mind=min(mind,dist(selected[i], Lambda[j]));
-	   if(maxd < mind)
-	   {
-		maxd=mind;
-		index=j;
-	   }
-	}
-	selected.push_back(Lambda[index]);
-	iter_swap(Lambda.begin()+index, Lambda.end()-1);
-        Lambda.pop_back();
-   }
-   return selected;
 }

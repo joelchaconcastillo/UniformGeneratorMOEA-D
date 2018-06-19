@@ -52,7 +52,8 @@ int main(int argc, char * argv[])
 
 
   UniformGenerator Obj;
-  vector< vector<double> > Wvec = Obj.GenerateWeightVectors(Objectives, Vectors);
+//  vector< vector<double> > Wvec = Obj.HeuristicUDM(Objectives, Vectors);
+  vector< vector<double> > Wvec = Obj.UDM(Objectives, Vectors);
   for(int i = 0; i < Wvec.size(); i++)
   {
 	for(int j = 0; j< Objectives; j++)
